@@ -4,6 +4,7 @@
 #include "ddebug.h"
 
 #include "ngx_http_set_hash.h"
+#include <openssl/sha.h>
 
 #if NGX_HAVE_SHA1
 #include "ngx_sha1.h"
@@ -80,4 +81,29 @@ ngx_http_set_misc_set_md5(ngx_http_request_t *r, ngx_str_t *res,
     res->len = MD5_HEX_LENGTH;
 
     return NGX_OK;
+}
+
+ngx_int_t
+ngx_http_set_misc_set_sha256(ngx_http_request_t *r, ngx_str_t *res,
+    ngx_http_variable_value_t *v)
+{
+    u_char *p;
+    u_char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+
+    p = ngx_palloc(r->pool, SHA256_DIGEST_LENGTH * 2);
+    if (p == NULL) {
+        return NGX_ERROR;
+    }
+
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, v->data, v->len);
+    SHA256_Final(hash, &sha256);
+
+	ngx_hex_dump(p, hash, sizeof(hash));
+
+    res->data = p;
+    res->len = SHA256_DIGEST_LENGTH * 2;
+
+	return NGX_OK;
 }

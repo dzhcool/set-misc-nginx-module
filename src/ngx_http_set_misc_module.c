@@ -116,6 +116,12 @@ static ndk_set_var_t  ngx_http_set_misc_set_md5_filter = {
     NULL
 };
 
+static ndk_set_var_t  ngx_http_set_misc_set_sha256_filter = {
+    NDK_SET_VAR_VALUE,
+    (void *) ngx_http_set_misc_set_sha256,
+    1,
+    NULL
+};
 
 #if NGX_HAVE_SHA1
 static ndk_set_var_t  ngx_http_set_misc_set_sha1_filter = {
@@ -307,6 +313,14 @@ static ngx_command_t  ngx_http_set_misc_commands[] = {
         0,
         0,
         &ngx_http_set_misc_set_md5_filter
+    },
+    {   ngx_string ("set_sha256"),
+        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF
+            |NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE12,
+        ndk_set_var_value,
+        0,
+        0,
+        &ngx_http_set_misc_set_sha256_filter
     },
 #if NGX_HAVE_SHA1
     {
